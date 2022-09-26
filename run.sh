@@ -1,5 +1,11 @@
-cd out/  
-rm -r *
+#!/bin/bash
+if [ -d "out" ]
+then
+    cd out/
+else 
+    mkdir out
+fi
+
 cmake ..
 cmake --build .
-./opengl_renderer
+./OpenGLSetup
