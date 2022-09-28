@@ -38,6 +38,7 @@ static int createProgram(const std::string& vShader, const std::string& fShader)
     glDeleteShader(fragmentShader);
     return program;
 }
+
 int main()
 {
     GLFWwindow* window;
@@ -48,7 +49,10 @@ int main()
         std::cout << "Failed to initialize GLFW!\n";
         return -1;
     }
-
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
     if (!window)
@@ -69,23 +73,29 @@ int main()
     }
     unsigned int VBO = 0;
     glGenBuffers(1, &VBO);
+    
+    // macos compat
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO); 
+    
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
     const unsigned int bufferLength = 6;
-    float vertexBufferData[bufferLength] = {
+    float vertices[bufferLength] = {
             -0.5f, -0.5f,
              0.0f,  0.5f,
-             0.5f, -0.5f,
-             
+             0.5f, -0.5f,       
     };
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * bufferLength, vertexBufferData, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 2,GL_FLOAT,GL_FALSE, sizeof(float) * 2, 0);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * bufferLength, vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 2, GL_FLOAT,GL_FALSE, sizeof(float) * 2, 0);
     glEnableVertexAttribArray(0);
     // Shaders
     const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec4 aPos;\n"
+    "layout (location = 0) in vec4 pos;\n"
     "void main()\n"
     "{\n"
-    "   gl_Position = vec4(aPos);\n"
+    "   gl_Position = vec4(pos);\n"
     "}";
     const char *fragmentShaderSource = "#version 330 core\n"
     "out vec4 fColor;\n"
